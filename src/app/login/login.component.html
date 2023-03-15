@@ -1,0 +1,41 @@
+<div>
+    <form style="margin-top: 100px; width: 250px; margin-left: auto; margin-right: auto;" [formGroup]="loginForm">
+        <!-- Email input -->
+        <div class="form-outline mb-4">
+          <label class="form-label" for="email">Email address</label>
+
+          <input type="email" id="email" class="form-control" formControlName="email"/>
+
+          <div
+          *ngIf="email?.invalid && (email?.dirty || email?.touched)"
+          class="alert alert-danger mt-1"
+        >
+          <div *ngIf="email?.errors?.['required'] || email?.errors?.['pattern']">Please enter a valid email</div>
+        </div>
+        </div>
+      
+        <!-- Password input -->
+        <div class="form-outline mb-4">
+
+          <label class="form-label" for="password">Password</label>
+
+          <input type="password" id="password" class="form-control" formControlName="password" />
+
+          <div
+          *ngIf="password?.invalid && (password?.dirty || password?.touched)"
+          class="alert alert-danger mt-1"
+        >
+          <div *ngIf="password?.errors?.['required'] || password?.errors?.['email']">Please enter the password</div>
+        </div>
+        </div>
+      
+        <!-- Submit button -->
+        <button type="button" class="btn btn-primary btn-block mb-4" [disabled]="loginForm.invalid" (click)="login()">Sign in</button>
+      
+        <!-- Register buttons -->
+        <div class="text-center">
+          <p>Not a member? <a style="cursor: pointer; color: blue;" rel="noopener" (click)="navigateToRegister()">Register</a></p>
+          
+        </div>
+      </form>
+    

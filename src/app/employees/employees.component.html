@@ -1,0 +1,205 @@
+<div  *ngrxLet="employees$ as employees">
+<h4 class="mt-20" style="font-weight: bold; text-align: center">
+    Employees
+  </h4>
+  <table
+    class="table table-striped"
+    style="
+      margin-bottom: 12px;
+      margin-top: 12px;
+      width: 50%;
+      margin-left: auto;
+      margin-right: auto;
+    "
+  >
+    <thead>
+      <tr>
+        <th scope="col">#</th>
+        <th scope="col">First Name</th>
+        <th scope="col">Last Name</th>
+        <th scope="col">Email</th>
+        <th scope="col">Manager</th>
+        <th scope="col">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let employee of employees; let i = index">
+        <th scope="row">{{ i + 1 }}</th>
+        <td>{{ employee?.firstName }}</td>
+        <td>{{ employee?.lastName }}</td>
+        <td>{{ employee?.email }}</td>
+        <td>{{ employee?.managerName }}</td>
+        <td
+          style="
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            gap: 8px;
+          "
+        >
+          <button class="btn btn-info" (click)="goToEmployeeDetails(employee.id)">See Details</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <div class="flex justify-center mx-auto">
+    <button class="left-0 btn btn-info" (click)="openAddEmployeeModal()">Add Employee</button>
+  </div>
+</div>
+
+
+<!--Add User Modal-->
+<div
+  class="backdrop"
+  [ngStyle]="{ display: displayAddEmployeeModal }"
+  role="dialog"
+  tabindex="-1"
+></div>
+<div class="modal" tabindex="-1" role="dialog" [ngStyle]="{ display: displayAddEmployeeModal }">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel4">Add Employee</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-mdb-dismiss="modal"
+          aria-label="Close"
+          (click)="onCloseHandled()"
+        ></button>
+      </div>
+      <div class="modal-body"  >
+        <form
+  style="width: 80%; margin-left: auto; margin-right: auto"
+  [formGroup]="addUserForm"
+>
+<!--First Name-->
+<div class="mb-4 form-outline">
+
+  <input
+    type="text"
+    id="firstName"
+    class="form-control"
+    formControlName="firstName"
+    placeholder="First Name"
+  />
+  <div
+  *ngIf="firstName?.invalid && (firstName?.dirty || firstName?.touched)"
+  class="mt-1 alert alert-danger"
+>
+  <div *ngIf="firstName?.errors?.['required']">Please enter your first name</div>
+</div>
+</div>
+
+<!--Last Name-->
+<div class="mb-4 form-outline">
+
+  <input
+    type="text"
+    id="lastName"
+    class="form-control"
+    formControlName="lastName"
+    placeholder="Last Name"
+  />
+  <div
+  *ngIf="lastName?.invalid && (lastName?.dirty || lastName?.touched)"
+  class="mt-1 alert alert-danger"
+>
+  <div *ngIf="lastName?.errors?.['required']">Please enter your last name</div>
+</div>
+</div>
+
+  <!-- Email input -->
+  <div class="mb-4 form-outline">
+
+    <input
+      type="email"
+      id="email"
+      class="form-control"
+      formControlName="email"
+      placeholder="Email"
+    />
+
+    <div
+      *ngIf="email?.invalid && (email?.dirty || email?.touched)"
+      class="mt-1 alert alert-danger"
+    >
+      <div *ngIf="email?.errors?.['required'] || email?.errors?.['pattern']">Please enter the email</div>
+    </div>
+  </div>
+
+   <!-- Password input -->
+   <div class="mb-4 form-outline">
+
+    <input
+      type="password"
+      id="password"
+      class="form-control"
+      formControlName="password"
+      placeholder="Password"
+
+    />
+    <div
+    *ngIf="password?.invalid && (password?.dirty || password?.touched)"
+    class="mt-1 alert alert-danger"
+  >
+    <div *ngIf="password?.errors?.['required'] || password?.errors?.['email']">Please enter the password</div>
+  </div>
+  </div>
+
+  <!-- Phone Number input -->
+  <div class="mb-4 form-outline">
+
+    <input
+      type="text"
+      id="mobileNo"
+      class="form-control"
+      formControlName="mobileNo"
+      placeholder="Phone Number"
+
+    />
+    <div
+    *ngIf="mobileNo?.invalid && (mobileNo?.dirty || mobileNo?.touched)"
+    class="mt-1 alert alert-danger"
+  >
+    <div *ngIf="mobileNo?.errors?.['required']">Please enter the phone number</div>
+  </div>
+  </div>
+
+  <!-- Address input -->
+  <div class="mb-4 form-outline">
+
+    <input
+      type="text"
+      id="address"
+      class="form-control"
+      formControlName="address"
+      placeholder="Address"
+
+    />
+    <div
+    *ngIf="address?.invalid && (address?.dirty || address?.touched)"
+    class="mt-1 alert alert-danger"
+  >
+    <div *ngIf="address?.errors?.['required']">Please enter the address</div>
+  </div>
+  </div>
+
+</form>
+      </div>
+      <div class="modal-footer" style="justify-content: space-between">
+        <button type="button" class="btn btn-danger" (click)="onCloseHandled()">
+          Close
+        </button>
+        <button
+          type="button"
+          class="btn btn-success"
+          [disabled]="addUserForm.invalid"
+          (click)="addUser()"
+        >
+          Confirm
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

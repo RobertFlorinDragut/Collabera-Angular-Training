@@ -1,0 +1,312 @@
+<h4 class="mt-2" style="font-weight: bold; text-align: center">
+  Approved Participants
+</h4>
+<table
+  class="table table-striped"
+  style="
+    margin-bottom: 12px;
+    margin-top: 12px;
+    width: 50%;
+    margin-left: auto;
+    margin-right: auto;
+  "
+>
+  <thead>
+    <tr>
+      <th scope="col">#</th>
+      <th scope="col">First Name</th>
+      <th scope="col">Last Name</th>
+      <th scope="col">Email</th>
+      <th scope="col">Actions</th>
+    </tr>
+  </thead>
+  <tbody *ngrxLet="approvedParticipants$  as approvedParticipants">
+    <tr *ngFor="let participant of approvedParticipants; let i = index">
+      <th scope="row">{{ i + 1 }}</th>
+      <td (click)="goToEmployeeProfile(participant?.id)" class="cursor-pointer">{{ participant?.firstName }}</td>
+      <td (click)="goToEmployeeProfile(participant?.id)" class="cursor-pointer">{{ participant?.lastName }}</td>
+      <td (click)="goToEmployeeProfile(participant?.id)" class="cursor-pointer">{{ participant?.email }}</td>
+      <td
+        style="
+          display: flex;
+          flex-direction: row;
+          justify-content: space-between;
+          gap: 8px;
+        "
+      >
+        <button class="btn btn-info" (click)="openSeeEmployeeFeedbackModal(participant.id)">See Feedback</button>
+        <button class="btn btn-success" (click)="openSeeAttendanceModal(participant.id)">See Attendance</button>
+        <button class="btn btn-danger" (click)="openModal(participant.id)" *ngIf="showReject">Decline</button>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<h4 class="mt-4" style="font-weight: bold; text-align: center">
+  Possible Participants
+</h4>
+<table
+  class="table table-striped"
+  style="
+    margin-bottom: 12px;
+    margin-top: 12px;
+    width: 50%;
+    margin-left: auto;
+    margin-right: auto;
+  "
+>
+  <thead>
+    <tr>
+      <th scope="col">#</th>
+      <th scope="col">First Name</th>
+      <th scope="col">Last Name</th>
+      <th scope="col">Email</th>
+      <th scope="col">Action</th>
+    </tr>
+  </thead>
+  <tbody *ngrxLet="pendingParticipants$  as pendingParticipants">
+    <tr *ngFor="let participant of pendingParticipants; let i = index">
+      <th scope="row">{{ i + 1 }}</th>
+      <td (click)="goToEmployeeProfile(participant?.id)" class="cursor-pointer">{{ participant?.firstName }}</td>
+      <td (click)="goToEmployeeProfile(participant?.id)" class="cursor-pointer">{{ participant?.lastName }}</td>
+      <td (click)="goToEmployeeProfile(participant?.id)" class="cursor-pointer">{{ participant?.email }}</td>
+      <td
+        style="
+          display: flex;
+          flex-direction: row;
+          justify-content: space-between;
+          gap: 8px;
+        "
+      >
+        <button class="btn btn-success" (click)="approveTraining(participant.id)">Approve</button>
+        <button class="btn btn-danger" (click)="openModal(participant.id)">Decline</button>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<h4 class="mt-4" style="font-weight: bold; text-align: center">
+  Rejected Participants
+</h4>
+<table
+  class="table table-striped"
+  style="
+    margin-bottom: 12px;
+    margin-top: 12px;
+    width: 50%;
+    margin-left: auto;
+    margin-right: auto;
+  "
+>
+  <thead>
+    <tr>
+      <th scope="col">#</th>
+      <th scope="col">First Name</th>
+      <th scope="col">Last Name</th>
+      <th scope="col">Email</th>
+      <th scope="col">Actions</th>
+    </tr>
+  </thead>
+  <tbody  *ngrxLet="rejectedParticipants$  as rejectedParticipants">
+    <tr *ngFor="let participant of rejectedParticipants; let i = index">
+      <th scope="row">{{ i + 1 }}</th>
+      <td (click)="goToEmployeeProfile(participant?.id)" class="cursor-pointer">{{ participant?.firstName }}</td>
+      <td (click)="goToEmployeeProfile(participant?.id)" class="cursor-pointer">{{ participant?.lastName }}</td>
+      <td (click)="goToEmployeeProfile(participant?.id)" class="cursor-pointer">{{ participant?.email }}</td>
+      <td style=" display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      gap: 8px;"><button class="btn btn-info" (click)="openSeeManagerFeedbackModal(participant.id)">See Feedback</button>
+      <button class="btn btn-success" (click)="approveTraining(participant.id)">Approve</button>
+    </td>
+    </tr>
+  </tbody>
+</table>
+
+<div
+  class="backdrop"
+  [ngStyle]="{ display: display }"
+  role="dialog"
+  tabindex="-1"
+></div>
+<div class="modal" tabindex="-1" role="dialog" [ngStyle]="{ display: display }">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel4">Decline participation</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-mdb-dismiss="modal"
+          aria-label="Close"
+          (click)="onCloseHandled()"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <form [formGroup]="rejectForm">
+          <!-- Description input -->
+          <div class="mb-4 form-outline">
+            <textarea
+              type="text"
+              id="feedback"
+              class="form-control"
+              placeholder="Feedback"
+              formControlName="feedback"
+            >
+            </textarea>
+            <div
+              *ngIf="
+                feedback?.invalid && (feedback?.dirty || feedback?.touched)
+              "
+              class="mt-1 alert alert-danger"
+            >
+              <div *ngIf="feedback?.errors?.['required']">
+                Please enter the feedback
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer" style="justify-content: space-between">
+        <button type="button" class="btn btn-danger" (click)="onCloseHandled()">
+          Close
+        </button>
+        <button
+          type="button"
+          class="btn btn-success"
+          [disabled]="rejectForm.invalid"
+          (click)="reject()"
+        >
+          Confirm
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!--SEE ATTENDANCE MODAL-->
+<div
+  class="backdrop"
+  [ngStyle]="{ display: displaySeeAttendance }"
+  role="dialog"
+  tabindex="-1"
+></div>
+<div class="modal" tabindex="-1" role="dialog" [ngStyle]="{ display: displaySeeAttendance }">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel4">See Attendance</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-mdb-dismiss="modal"
+          aria-label="Close"
+          (click)="onCloseHandled()"
+        ></button>
+      </div>
+      <div class="modal-body"  *ngrxLet="employeeAttendances$  as employeeAttendances">
+        <span *ngIf="!checkHasAttendances(employeeAttendances)">No attendance added so far</span>
+          <table  *ngIf="checkHasAttendances(employeeAttendances)"
+  class="table table-striped"
+  style="
+    margin-bottom: 12px;
+    margin-top: 12px;
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+  "
+>
+  <thead>
+    <tr>
+      <th scope="col">#</th>
+      <th scope="col">Date</th>
+      <th scope="col">Attended</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let employeeAttendance of employeeAttendances; let i = index">
+      <th scope="row">{{ i + 1 }}</th>
+      <td>{{ employeeAttendance?.date | date: 'yyyy-MM-dd hh:mm:ss' }}</td>
+      <td>{{ employeeAttendance?.attended === true ? 'Yes' : 'No' }}</td>
+      
+    </tr>
+  </tbody>
+</table>
+       
+      </div>
+      <div class="modal-footer" style="justify-content: space-between">
+        <button type="button" class="btn btn-danger" (click)="onCloseHandled()">
+          Close
+        </button>
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+<!--SEE EMPLOYEE FEEDBACK MODAL-->
+<div
+  class="backdrop"
+  [ngStyle]="{ display: displaySeeEmployeeFeedback }"
+  role="dialog"
+  tabindex="-1"
+></div>
+<div class="modal" tabindex="-1" role="dialog" [ngStyle]="{ display: displaySeeEmployeeFeedback }">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel4">Feedback</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-mdb-dismiss="modal"
+          aria-label="Close"
+          (click)="onCloseHandled()"
+        ></button>
+      </div>
+      <div class="modal-body"  *ngrxLet="employeeFeedback$ as employeeFeedback">
+        <span>{{employeeFeedback?.feedback !== null ? employeeFeedback?.feedback : 'No feedback added so far'}}</span>
+      </div>
+      <div class="modal-footer" style="justify-content: space-between">
+        <button type="button" class="btn btn-danger" (click)="onCloseHandled()">
+          Close
+        </button>
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!--SEE MANAGER FEEDBACK MODAL-->
+<div
+  class="backdrop"
+  [ngStyle]="{ display: displaySeeManagerFeedback }"
+  role="dialog"
+  tabindex="-1"
+></div>
+<div class="modal" tabindex="-1" role="dialog" [ngStyle]="{ display: displaySeeManagerFeedback }">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel4">Feedback</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-mdb-dismiss="modal"
+          aria-label="Close"
+          (click)="onCloseHandled()"
+        ></button>
+      </div>
+      <div class="modal-body"  *ngrxLet="managerFeedback$ as managerFeedback">
+        <span>{{managerFeedback?.feedback !== null ? managerFeedback?.feedback : 'No feedback added so far'}}</span>
+      </div>
+      <div class="modal-footer" style="justify-content: space-between">
+        <button type="button" class="btn btn-danger" (click)="onCloseHandled()">
+          Close
+        </button>
+        
+      </div>
+    </div>
+  </div>
+</div>

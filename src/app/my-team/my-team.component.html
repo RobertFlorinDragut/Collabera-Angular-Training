@@ -1,0 +1,46 @@
+<div  *ngrxLet="employees$ as employees">
+    <h4 class="mt-20" style="font-weight: bold; text-align: center">
+        My Team
+      </h4>
+      <table
+        class="table table-striped"
+        style="
+          margin-bottom: 12px;
+          margin-top: 12px;
+          width: 50%;
+          margin-left: auto;
+          margin-right: auto;
+        "
+      >
+        <thead>
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">First Name</th>
+            <th scope="col">Last Name</th>
+            <th scope="col">Email</th>
+            <th scope="col">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let employee of employees; let i = index">
+            <th scope="row">{{ i + 1 }}</th>
+            <td>{{ employee?.firstName }}</td>
+            <td>{{ employee?.lastName }}</td>
+            <td>{{ employee?.email }}</td>
+            <td
+              style="
+                display: flex;
+                flex-direction: row;
+                justify-content: space-between;
+                gap: 8px;
+              "
+            >
+              <button class="btn btn-info" (click)="goToEmployeeDetails(employee.id)">See Details</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+     
+    </div>
+    
+   

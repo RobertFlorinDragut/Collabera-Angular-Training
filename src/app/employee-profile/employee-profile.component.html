@@ -1,0 +1,375 @@
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>TrainingManagementSystem</title>
+    <base href="/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/x-icon" href="favicon.ico" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+    />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.47/js/bootstrap-datetimepicker.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.47/css/bootstrap-datetimepicker.min.css"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"></script>
+  </head>
+</html>
+
+<div class="flex flex-col w-full mx-auto">
+<div class=" main">
+    
+    <div class="w-2/5 mx-auto card">
+        <div class="card-body" *ngrxLet="employee$  as employee">
+            <table>
+                <tbody>
+                    <tr>
+                        <td>First Name</td>
+                        <td>{{employee?.firstName}}</td>
+                    </tr>
+                    <tr>
+                        <td>Last Name</td>
+                        <td>{{employee?.lastName}}</td>
+                    </tr>
+                    <tr>
+                        <td>Email</td>
+                        <td>{{employee?.email}}</td>
+                    </tr>
+                    <tr *ngIf="hasHRRole">
+                      <td>Manager</td>
+                      <td>{{employee?.managerName}}</td>
+                  </tr>
+                    <tr>
+                        <td>Address</td>
+                        <td>{{employee?.address}}</td>
+                    </tr>
+                    <tr>
+                        <td>Mobile No</td>
+                        <td>{{employee?.mobileNo}}</td>
+                    </tr>
+                    
+                </tbody>
+            </table>
+            <div class="flex flex-row justify-center gap-3" *ngIf="hasHRRole">
+                <button class="left-0 btn btn-success" (click)="openUpdateInfoModal()">Update</button>
+                <button class="right-0 btn btn-info" (click)="openChangeManagerModal()" >ChangeManager</button>
+                <button class="right-0 btn btn-danger" (click)="openDeleteModal()" >Delete</button>
+            </div>
+        </div>
+    </div>
+
+
+
+    <div class="flex flex-col mx-auto mt-3" *ngIf="(trainings$ | async)!.length > 0">
+        <h2 class="text-center">Trainings</h2>
+        <div
+          class="mx-4"
+          style="
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+          "
+        >
+          <div class="border border-r border-red-500" style="width: 300px" *ngFor="let training of trainings$ | async">
+            <img
+              class="card-img-top"
+              [src]="getImage(training.name)"
+              alt="Card image cap"
+              style="height: 200px"
+            />
+            <div class="card-body">
+              <h5 class="card-title">{{ training.name }}</h5>
+              <!-- <p class="card-text">Date: {{ training.date | date }}</p> -->
+              <div
+                style="
+                  display: flex;
+                  flex-direction: row;
+                  justify-content: space-between;
+                "
+              >
+                <a class="btn btn-primary" style="color: white" (click)="goToTrainingDetails(training.id)">See Details</a>
+              
+              </div>
+            </div>
+          </div>
+        </div>
+      </div></div>
+
+
+<!--Update Employee Info-->
+
+      <div
+  class="backdrop"
+  [ngStyle]="{ display: displayUpdateInfo }"
+  role="dialog"
+  tabindex="-1"
+></div>
+<div class="modal" tabindex="-1" role="dialog" [ngStyle]="{ display: displayUpdateInfo }">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel4">Add Attendance</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-mdb-dismiss="modal"
+          aria-label="Close"
+          (click)="onCloseHandled()"
+        ></button>
+      </div>
+      <div class="modal-body"  >
+        <form
+  style="width: 80%; margin-left: auto; margin-right: auto"
+  [formGroup]="updateForm"
+>
+<!--First Name-->
+<div class="mb-4 form-outline">
+
+  <input
+    type="text"
+    id="firstName"
+    class="form-control"
+    formControlName="firstName"
+    placeholder="First Name"
+  />
+  <div
+  *ngIf="firstName?.invalid && (firstName?.dirty || firstName?.touched)"
+  class="mt-1 alert alert-danger"
+>
+  <div *ngIf="firstName?.errors?.['required']">Please enter your first name</div>
+</div>
+</div>
+
+<!--Last Name-->
+<div class="mb-4 form-outline">
+
+  <input
+    type="text"
+    id="lastName"
+    class="form-control"
+    formControlName="lastName"
+    placeholder="Last Name"
+  />
+  <div
+  *ngIf="lastName?.invalid && (lastName?.dirty || lastName?.touched)"
+  class="mt-1 alert alert-danger"
+>
+  <div *ngIf="lastName?.errors?.['required']">Please enter your last name</div>
+</div>
+</div>
+
+  <!-- Email input -->
+  <div class="mb-4 form-outline">
+
+    <input
+      type="email"
+      id="email"
+      class="form-control"
+      formControlName="email"
+      placeholder="Email"
+    />
+
+    <div
+      *ngIf="email?.invalid && (email?.dirty || email?.touched)"
+      class="mt-1 alert alert-danger"
+    >
+      <div *ngIf="email?.errors?.['required'] || email?.errors?.['pattern']">Please enter the email</div>
+    </div>
+  </div>
+
+  <!-- Phone Number input -->
+  <div class="mb-4 form-outline">
+
+    <input
+      type="text"
+      id="mobileNo"
+      class="form-control"
+      formControlName="mobileNo"
+      placeholder="Phone Number"
+
+    />
+    <div
+    *ngIf="mobileNo?.invalid && (mobileNo?.dirty || mobileNo?.touched)"
+    class="mt-1 alert alert-danger"
+  >
+    <div *ngIf="mobileNo?.errors?.['required']">Please enter the phone number</div>
+  </div>
+  </div>
+
+  <!-- Address input -->
+  <div class="mb-4 form-outline">
+
+    <input
+      type="text"
+      id="address"
+      class="form-control"
+      formControlName="address"
+      placeholder="Address"
+
+    />
+    <div
+    *ngIf="address?.invalid && (address?.dirty || address?.touched)"
+    class="mt-1 alert alert-danger"
+  >
+    <div *ngIf="address?.errors?.['required']">Please enter the address</div>
+  </div>
+  </div>
+
+</form>
+      </div>
+      <div class="modal-footer" style="justify-content: space-between">
+        <button type="button" class="btn btn-danger" (click)="onCloseHandled()">
+          Close
+        </button>
+        <button
+          type="button"
+          class="btn btn-success"
+          [disabled]="updateForm.invalid"
+          (click)="updateUserInfo()"
+        >
+          Confirm
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!--Delete Employee-->
+<div
+  class="backdrop"
+  [ngStyle]="{ display: displayDeleteModal }"
+  role="dialog"
+  tabindex="-1"
+></div>
+<div class="modal" tabindex="-1" role="dialog" [ngStyle]="{ display: displayDeleteModal }">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel4">Delete Employee</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-mdb-dismiss="modal"
+          aria-label="Close"
+          (click)="onCloseHandled()"
+        ></button>
+      </div>
+      <div class="modal-body">
+       Are you sure you want to delete this employee?
+      </div>
+      <div class="modal-footer" style="justify-content: space-between">
+        <button type="button" class="btn btn-danger" (click)="onCloseHandled()">
+          Close
+        </button>
+        <button
+          type="button"
+          class="btn btn-success"
+          (click)="delete()"
+        >
+          Confirm
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<!--Change Manager-->
+
+<div
+class="backdrop"
+[ngStyle]="{ display: displayChangeManagerModal }"
+role="dialog"
+tabindex="-1"
+></div>
+<div class="modal" tabindex="-1" role="dialog" [ngStyle]="{ display: displayChangeManagerModal }">
+<div class="modal-dialog" role="document">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h5 class="modal-title" id="exampleModalLabel4">Change Manager</h5>
+      <button
+        type="button"
+        class="btn-close"
+        data-mdb-dismiss="modal"
+        aria-label="Close"
+        (click)="onCloseHandled()"
+      ></button>
+    </div>
+    <div class="modal-body"  >
+      <form
+style="width: 80%; margin-left: auto; margin-right: auto"
+[formGroup]="changeManagerForm"
+>
+<!--Manager-->
+<div class="mb-4 form-outline">
+
+  <label class="form-label" for="date">Manager</label>
+  <select
+    class="form-select"
+    aria-label="Default select example"
+    style=" height: 38px"
+    formControlName="manager"
+  >
+    <option
+      class="form-control"
+      *ngFor="let manager of managers$ | async"
+      [value]="manager.id"
+    >
+      {{ manager.firstName + ' ' + manager.lastName  }}
+    </option>
+  </select>
+
+  <div
+  *ngIf="manager?.invalid && (manager?.dirty || manager?.touched)"
+  class="mt-1 alert alert-danger"
+>
+  <div *ngIf="manager?.errors?.['required']">Please select a manager</div>
+</div>
+</div>
+
+</form>
+    </div>
+    <div class="modal-footer" style="justify-content: space-between">
+      <button type="button" class="btn btn-danger" (click)="onCloseHandled()">
+        Close
+      </button>
+      <button
+        type="button"
+        class="btn btn-success"
+        [disabled]="changeManagerForm.invalid"
+        (click)="changeManager()"
+      >
+        Confirm
+      </button>
+    </div>
+  </div>
+</div>
+</div>
+

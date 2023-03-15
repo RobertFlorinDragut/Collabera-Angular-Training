@@ -1,0 +1,284 @@
+<div
+  class="justify-center mx-auto mt-4 text-center"
+  *ngrxLet="employeeTraining$ as employeeTraining"
+ 
+>
+<div *ngIf="employeeTraining">
+  <h2>Status: {{ employeeTraining?.status }}</h2>
+  <h2 *ngIf="employeeTraining?.feedback !== ''">
+    Feedback: {{ employeeTraining?.feedback }}
+  </h2>
+</div>
+  <div
+    class="flex flex-row justify-center gap-8"
+    *ngIf="
+      employeeTraining?.status === 'Approved'"
+  >
+    <button class="btn btn-info" (click)="openAttendanceModal()" *ngIf="(availableAttendanceDates$ | async)!.length > 0">
+      Add Attendance
+    </button>
+    <button class="btn btn-info" (click)="openSeeAttendanceModal()" *ngIf="(employeeAttendances$ | async)!.length > 0">
+      See Attendance
+    </button>
+    <button class="btn btn-info" (click)="addFeedbackModal()" *ngIf="(employeeFeedback$ | async)==undefined">Add Feedback</button>
+    <button class="btn btn-info" (click)="openSeeFeedbackModal()" *ngIf="(employeeFeedback$ | async)!==undefined">
+      See Feedback
+    </button>
+  </div>
+</div>
+
+
+<!--Add attendance modal-->
+<div
+  class="backdrop"
+  [ngStyle]="{ display: displayAddAttendance }"
+  role="dialog"
+  tabindex="-1"
+></div>
+<div class="modal" tabindex="-1" role="dialog" [ngStyle]="{ display: displayAddAttendance }">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel4">Add Attendance</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-mdb-dismiss="modal"
+          aria-label="Close"
+          (click)="onCloseHandled()"
+        ></button>
+      </div>
+      <div class="modal-body"  >
+        <form [formGroup]="attendanceForm">
+          <!-- Date -->
+          <div class="mb-4 form-outline" style="width: 100%;">
+            <label class="form-label" for="date">Date</label>
+            <select
+              class="form-select"
+              aria-label="Default select example"
+              style=" height: 38px"
+              formControlName="date"
+            >
+              <option
+                class="form-control"
+                *ngFor="let availableAttendanceDate of availableAttendanceDates$ | async"
+                [value]="availableAttendanceDate"
+              >
+                {{ availableAttendanceDate | date: 'yyyy-MM-dd hh:mm:ss' }}
+              </option>
+            </select>
+        
+            <div
+            *ngIf="date?.invalid && (date?.dirty || date?.touched)"
+            class="mt-1 alert alert-danger"
+          >
+            <div *ngIf="date?.errors?.['required']">Please select a date</div>
+          </div>
+          </div>
+          
+          <div class="mb-4 form-outline" style="width: 100%;">
+            <label class="form-label" for="attendance">Attended</label>
+            <select
+              class="form-select"
+              aria-label="Default select example"
+              style=" height: 38px"
+              formControlName="attendance"
+            >
+              <option
+                class="form-control"
+                [value]= "'yes'"
+              >
+                Yes
+              </option>
+              <option
+                class="form-control"
+                [value]="'no'"
+              >
+                No
+              </option>
+            </select>
+        
+            <div
+            *ngIf="attendance?.invalid && (attendance?.dirty || attendance?.touched)"
+            class="mt-1 alert alert-danger"
+          >
+            <div *ngIf="attendance?.errors?.['required']">Please select a value</div>
+          </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer" style="justify-content: space-between">
+        <button type="button" class="btn btn-danger" (click)="onCloseHandled()">
+          Close
+        </button>
+        <button
+          type="button"
+          class="btn btn-success"
+          [disabled]="attendanceForm.invalid"
+          (click)="addAttendance()"
+        >
+          Confirm
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+<!--SEE ATTENDANCE MODAL-->
+<div
+  class="backdrop"
+  [ngStyle]="{ display: displaySeeAttendance }"
+  role="dialog"
+  tabindex="-1"
+></div>
+<div class="modal" tabindex="-1" role="dialog" [ngStyle]="{ display: displaySeeAttendance }">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel4">See Attendance</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-mdb-dismiss="modal"
+          aria-label="Close"
+          (click)="onCloseHandled()"
+        ></button>
+      </div>
+      <div class="modal-body">
+        
+          <table
+  class="table table-striped"
+  style="
+    margin-bottom: 12px;
+    margin-top: 12px;
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+  "
+>
+  <thead>
+    <tr>
+      <th scope="col">#</th>
+      <th scope="col">Date</th>
+      <th scope="col">Attended</th>
+    </tr>
+  </thead>
+  <tbody *ngrxLet="employeeAttendances$  as employeeAttendances">
+    <tr *ngFor="let employeeAttendance of employeeAttendances; let i = index">
+      <th scope="row">{{ i + 1 }}</th>
+      <td>{{ employeeAttendance?.date | date: 'yyyy-MM-dd hh:mm:ss' }}</td>
+      <td>{{ employeeAttendance?.attended === true ? 'Yes' : 'No' }}</td>
+      
+    </tr>
+  </tbody>
+</table>
+       
+      </div>
+      <div class="modal-footer" style="justify-content: space-between">
+        <button type="button" class="btn btn-danger" (click)="onCloseHandled()">
+          Close
+        </button>
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+<!--Add feedback modal-->
+<div
+  class="backdrop"
+  [ngStyle]="{ display: displayAddFeedback }"
+  role="dialog"
+  tabindex="-1"
+></div>
+<div class="modal" tabindex="-1" role="dialog" [ngStyle]="{ display: displayAddFeedback }">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel4">Add feedback</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-mdb-dismiss="modal"
+          aria-label="Close"
+          (click)="onCloseHandled()"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <form [formGroup]="feedbackForm">
+          <!-- Description input -->
+          <div class="mb-4 form-outline">
+            <textarea
+              type="text"
+              id="feedback"
+              class="form-control"
+              placeholder="Feedback"
+              formControlName="feedback"
+            >
+            </textarea>
+            <div
+              *ngIf="
+                feedback?.invalid && (feedback?.dirty || feedback?.touched)
+              "
+              class="mt-1 alert alert-danger"
+            >
+              <div *ngIf="feedback?.errors?.['required']">
+                Please enter the feedback
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer" style="justify-content: space-between">
+        <button type="button" class="btn btn-danger" (click)="onCloseHandled()">
+          Close
+        </button>
+        <button
+          type="button"
+          class="btn btn-success"
+          [disabled]="feedbackForm.invalid"
+          (click)="addFeedback()"
+        >
+          Confirm
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!--SEE FEEDBACK MODAL-->
+<div
+  class="backdrop"
+  [ngStyle]="{ display: displaySeeFeedback }"
+  role="dialog"
+  tabindex="-1"
+></div>
+<div class="modal" tabindex="-1" role="dialog" [ngStyle]="{ display: displaySeeFeedback }">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel4">Feedback</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-mdb-dismiss="modal"
+          aria-label="Close"
+          (click)="onCloseHandled()"
+        ></button>
+      </div>
+      <div class="modal-body"  *ngrxLet="employeeFeedback$ as employeeFeedback">
+        <span>{{employeeFeedback?.feedback}}</span>
+      </div>
+      <div class="modal-footer" style="justify-content: space-between">
+        <button type="button" class="btn btn-danger" (click)="onCloseHandled()">
+          Close
+        </button>
+        
+      </div>
+    </div>
+  </div>
+</div>

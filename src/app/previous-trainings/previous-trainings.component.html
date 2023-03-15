@@ -1,0 +1,85 @@
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>TrainingManagementSystem</title>
+    <base href="/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/x-icon" href="favicon.ico" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+    />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.47/js/bootstrap-datetimepicker.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.47/css/bootstrap-datetimepicker.min.css"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"></script>
+  </head>
+</html>
+
+<div class="flex flex-col" style="margin-top: 60px">
+
+  <div
+    class="mx-4"
+    style="
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 12px;
+    "
+  >
+    <div class="card" style="width: 300px" *ngFor="let training of trainings$ | async">
+      <img
+        class="card-img-top"
+        [src]="getImage(training.name)"
+        alt="Card image cap"
+        style="height: 200px"
+      />
+      <div class="card-body">
+        <h5 class="card-title">{{ training.name }}</h5>
+        <!-- <p class="card-text">Date: {{ training.date | date }}</p> -->
+        <div
+          style="
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+          "
+        >
+          <a class="btn btn-primary" style="color: white" (click)="goToTrainingDetails(training.id)">See Details</a>
+          <a class="btn btn-success" style="color: white" *ngIf="!checkApplied(training.id)" (click)="apply(training.id)">Apply</a>
+          <a class="btn btn-danger" style="color: white" *ngIf="checkApplied(training.id) && !checkRejected(training.id) && !checkApproved(training.id)" (click)="cancel(training.id)">Cancel</a>
+          <a class="btn btn-danger" style="color: white" *ngIf="checkApplied(training.id) && checkRejected(training.id) && !checkApproved(training.id)">Rejected</a>
+          <a class="btn btn-success" style="color: white" *ngIf="checkApplied(training.id) && !checkRejected(training.id) && checkApproved(training.id)">Approved</a>
+
+        
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+

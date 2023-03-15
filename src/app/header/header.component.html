@@ -1,0 +1,238 @@
+<nav
+  class="navbar navbar-expand-lg navbar-light bg-light"
+  style="position: fixed; z-index: 999; top: 0; width: 100%"
+>
+  <img
+    width="40"
+    alt="Training Logo"
+    src="https://f.hubspotusercontent30.net/hubfs/3277184/employee%20training%20and%20development.png"
+    style="margin-right: 4px"
+  />
+  <a class="navbar-brand" href="#">Training Management System</a>
+
+  <div class="navbar-collapse" id="navbarText">
+    <ul class="mr-auto navbar-nav">
+      <li
+        class="nav-item"
+        [ngClass]="{ active: url === '/profile' }"
+        *ngIf="loggedIn"
+      >
+        <a
+          class="nav-link"
+          style="cursor: pointer"
+          (click)="navigateToUserProfile()"
+        >
+          Welcome, {{ userName }}
+        </a>
+      </li>
+
+      <li class="nav-item" [ngClass]="{ active: url === '/home' }" *ngIf="loggedIn">
+        <a class="nav-link" style="cursor: pointer" (click)="navigateToHome()">
+          Dashboard
+        </a>
+      </li>
+
+      <li class="nav-item" [ngClass]="{ active: url === '/my-trainings' }" *ngIf="loggedIn && hasEmployeeRole">
+        <a class="nav-link" style="cursor: pointer" (click)="navigateMyTrainings()">
+          My Trainings
+        </a>
+      </li>
+
+      <li class="nav-item" [ngClass]="{ active: url === '/my-team' }" *ngIf="loggedIn && hasManagerRole">
+        <a class="nav-link" style="cursor: pointer" (click)="navigateToMyTeam()">
+          My Team
+        </a>
+      </li>
+
+      <li class="nav-item" [ngClass]="{ active: url === '/schedule-training' }" *ngIf="loggedIn && hasHRRole">
+        <a class="nav-link" style="cursor: pointer" (click)="openModal()">
+          Schedule Training
+        </a>
+      </li>
+
+      
+      <li class="nav-item" [ngClass]="{ active: url === '/employees' }" *ngIf="loggedIn && hasHRRole">
+        <a class="nav-link" style="cursor: pointer" (click)="goToEmployees()">
+          View Employees
+        </a>
+      </li>
+
+      <li
+        class="nav-item"
+        [ngClass]="{ active: url === '/login' || url === '/register' }"
+        *ngIf="!loggedIn"
+      >
+        <a class="nav-link" style="cursor: pointer" (click)="navigateToLogin()">
+          Login
+        </a>
+      </li>
+
+      <li class="nav-item" *ngIf="loggedIn">
+        <a
+          class="absolute right-0 self-end nav-link"
+          style="cursor: pointer"
+          (click)="logout()"
+        >
+          Logout
+        </a>
+      </li>
+    </ul>
+  </div>
+</nav>
+
+<!-- Modal -->
+<div
+  class="backdrop"
+  [ngStyle]="{ display: display }"
+  role="dialog"
+  tabindex="-1"
+></div>
+<div class="modal" tabindex="-1" role="dialog" [ngStyle]="{ display: display }">
+  <div class="modal-dialog modal-dialog-scrollable" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel4">Add Training</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-mdb-dismiss="modal"
+          aria-label="Close"
+          (click)="onCloseHandled()"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <form [formGroup]="addTrainingForm">
+          <!-- Name input -->
+          <div class="mb-4 form-outline">
+            <input
+              type="text"
+              id="name"
+              class="form-control"
+              placeholder="Name"
+              formControlName="name"
+            />
+            <div
+              *ngIf="name?.invalid && (name?.dirty || name?.touched)"
+              class="mt-1 alert alert-danger"
+            >
+              <div *ngIf="name?.errors?.['required']">
+                Please enter the name of the training
+              </div>
+            </div>
+          </div>
+
+          <!-- Participants input -->
+          <div class="mb-4 form-outline">
+            <input
+              type="number"
+              id="participants"
+              class="form-control"
+              placeholder="Number of participants"
+              formControlName="maxNoOfParticipants"
+            />
+            <div
+              *ngIf="
+              maxNoOfParticipants?.invalid &&
+                (maxNoOfParticipants?.dirty || maxNoOfParticipants?.touched)
+              "
+              class="mt-1 alert alert-danger"
+            >
+              <div
+                *ngIf="maxNoOfParticipants?.errors?.['required'] || maxNoOfParticipants?.errors?.['min']"
+              >
+                Please enter the number of participants
+              </div>
+            </div>
+          </div>
+
+          <!-- Description input -->
+          <div class="mb-4 form-outline">
+            <textarea
+              type="text"
+              id="description"
+              class="form-control"
+              placeholder="Description"
+              formControlName="description"
+            >
+            </textarea>
+            <div
+              *ngIf="
+                description?.invalid &&
+                (description?.dirty || description?.touched)
+              "
+              class="mt-1 alert alert-danger"
+            >
+              <div *ngIf="description?.errors?.['required']">
+                Please enter the description
+              </div>
+            </div>
+          </div>
+
+          <div class="mb-4 form-outline" style="width: 100%">
+            <label class="form-label" for="status">Status</label>
+            <select
+              class="form-select"
+              aria-label="Default select example"
+              style="height: 38px"
+              formControlName="status"
+            >
+              <option
+                class="form-control"
+                *ngFor="let stat of statuses | keyvalue"
+                [value]="stat.value"
+              >
+                {{ stat.value }}
+              </option>
+            </select>
+
+            <div
+              *ngIf="status?.invalid && (status?.dirty || status?.touched)"
+              class="mt-1 alert alert-danger"
+            >
+              <div
+                *ngIf="status?.errors?.['required'] || status?.errors?.['email']"
+              >
+                Please select a status
+              </div>
+            </div>
+          </div>
+
+          
+            <div class="mb-4 form-outline">
+          
+              <div formArrayName="trainingDates">
+                <div *ngFor="let date of trainingDates.controls let i=index">
+                  <input type="datetime-local"  class="form-control" placeholder="Date" formControlName="{{i}}" [min]="currentDate | date:'yyyy-MM-ddTHH:mm'">
+                  <button
+                  type="button"
+                  style="float: right"
+                  class="mt-2 mb-2 btn btn-danger"
+                  (click)="removeDate(i)"
+                >
+                  Remove Date
+                </button>
+              </div>
+            </div>
+            </div> 
+
+          <button type="button" class="btn btn-info" (click)="addDate()">
+            Add Date
+          </button>
+        </form>
+      </div>
+      <div class="modal-footer" style="justify-content: space-between">
+        <button type="button" class="btn btn-danger" (click)="onCloseHandled()">
+          Close
+        </button>
+        <button
+          type="button"
+          class="btn btn-success"
+          [disabled]="addTrainingForm.invalid"
+          (click)="addTraining()"
+        >
+          Add
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,39 @@
+<div
+  style="
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    margin-left: auto;
+    margin-right: auto;
+    width: 80%;
+  "
+  *ngrxLet="training$  as training"
+>
+  <h2 style="text-align: center">{{training.name}}</h2>
+  <div style="display: flex; flex-direction: row; gap: 16px; margin-top: 12px">
+    <img
+      [src]="getImage(training.name)"
+      style="width: 30%; margin-left: auto; margin-right: auto; height: 400px;"
+      alt="Responsive image"
+    />
+    <div style="display: flex; flex-direction: column">
+      <h4>
+        {{training.description}}
+      </h4>
+      <div style="display: flex; flex-direction: row;"><h4 style="font-weight: bold;">Dates: </h4>
+        <div style="width: 4px;"></div>
+        <h4 *ngFor="let item of training.trainingDates" style="margin-right: 12px;">
+            {{item | date:'yyyy-MM-dd hh:mm'}}
+        </h4></div>
+      
+    </div>
+  </div>
+
+  <!-- <app-training-hr [trainingId]="trainingId"></app-training-hr> -->
+
+  <container-element [ngSwitch]="role">
+    <app-training-hr *ngSwitchCase="'HR'" [trainingId]="trainingId"></app-training-hr>
+    <app-training-manager *ngSwitchCase="'Manager'" [trainingId]="trainingId" [trainingDates]="training.trainingDates"></app-training-manager>
+    <app-training-employee *ngSwitchCase="'Employee'" [trainingId]="trainingId" [trainingDates]="training.trainingDates"></app-training-employee>
+  </container-element>
+</div>
